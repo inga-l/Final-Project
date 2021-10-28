@@ -1,0 +1,13 @@
+---
+title: "Final Project"
+author: "Ingrid J. Lu 260773949;"
+date: "28/10/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+## ---- Setup -----------------------------------------------------------------
+knitr::opts_chunk$set( echo = TRUE,
+warning = FALSE, message = FALSE, cache = FALSE, fig.align = "center", fig.asp = 1, fig.width = 10
+)
+```
