@@ -11,3 +11,28 @@ knitr::opts_chunk$set( echo = TRUE,
 warning = FALSE, message = FALSE, cache = FALSE, fig.align = "center", fig.asp = 1, fig.width = 10
 )
 ```
+
+
+```{r}
+# Question 1
+```
+
+```{r}
+# Question 2
+```
+
+```{r}
+# Question 3
+```
+
+```{r}
+# Question 4
+```
+
+```{r}
+# Question 5
+```
+
+```{r}
+# Question 6
+```

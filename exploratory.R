@@ -1,6 +1,7 @@
 library(pacman)
 p_load(tidyverse, here, ggplot2)
 
+setwd("~/Desktop/M1/EPIB607/Final Project/Datasets")
 
 weather <- read.csv("weatherAUS.csv")
 
@@ -20,3 +21,11 @@ head(netflix)
 
 airbnb <- read.csv("AB_NYC_2019.csv")
 str(airbnb)
+
+ggplot(airbnb, aes(x = minimum_nights)) + 
+  geom_bar()+
+  xlim(0, 100)
+
+placement <- read.csv("Placement_Data_Full_class.csv")
+
+head(placement)
