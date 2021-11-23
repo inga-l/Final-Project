@@ -10,8 +10,18 @@ output: pdf_document
 knitr::opts_chunk$set( echo = TRUE,
 warning = FALSE, message = FALSE, cache = FALSE, fig.align = "center", fig.asp = 1, fig.width = 10
 )
+
+library(pacman)
+p_load(ggplot2, tidyverse, here, readxl, mosaic, pwr, ggpubr, car)
+theme_set(theme_light())
 ```
 
+```{r}
+# Set-up
+df_fh <- readr::read_csv(here::here("fetal_health.csv")) %>% 
+  select(!starts_with("histogram"))
+
+```
 
 ```{r}
 # Question 1
