@@ -7,8 +7,12 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 ## ---- Setup -----------------------------------------------------------------
-knitr::opts_chunk$set( echo = TRUE,
-warning = FALSE, message = FALSE, cache = FALSE, fig.align = "center", fig.asp = 1, fig.width = 10
+knitr::opts_chunk$set(
+warning = FALSE,
+message = FALSE,
+cache = FALSE,
+fig.align = "center",
+fig.asp = 1
 )
 
 library(pacman)
@@ -35,26 +39,34 @@ Note: the objective of this exercise is to consolidate all the important concept
 ## a) {-}
 Is this data tidy? If no, transform it into an untidy data. If yes, provide an explanation.
 
-
+*Solution:*
 
 ## b) {-}
 Looking at the 3 different classification of fetal health status and each fetus' baseline heart rate provide an appropriate graphic summarizing the distribution of each of baseline heart rates for each class. Be sure to provide the correct title and label for the plot.
+
+*Solution:*
 
 ```{r}
 # Question 1
 
 # 1.b
-df_fh$fetal_health <- ifelse(df_fh$fetal_health == 1, "Normal", ifelse(df_fh$fetal_health == 2, "Suspect", "Pathological"))
+df_fh$fetal_health <- ifelse(df_fh$fetal_health == 1, 
+                             "Normal", 
+                             ifelse(df_fh$fetal_health == 2, 
+                                    "Suspect", 
+                                    "Pathological"))
 
-df_fh %>% group_by(fetal_health) %>%
+df_fh %>% 
+  group_by(fetal_health) %>%
   ggplot(aes(x = fetal_health, y = `baseline value`)) +
   geom_boxplot()
-
 ```
 
 ## c) {-}
 
 Describe the distribution of the baseline heart rate for all participants in this sample, is the baseline heart rate normally distributed, comment on any skewness. What about each class? Use an appropriate graph to answer this question.
+
+*Solution:*
 
 ```{r}
 ## 1.c
@@ -71,17 +83,24 @@ df_fh %>%
 
 # Question 2
 
-## b) {-}
+## a) {-}
 
 What is the mean baseline heart rate for each class?
 
-## c) {-}
-
-Since we have a small sample size for those who are suspected to be pathological and those who are truly pathological, what is the bootstrapped mean baseline heart rate for each class?
+*Solution:*
 
 ```{r}
 # Question 2
 ```
+
+## b) {-}
+
+Since we have a small sample size for those who are suspected to be pathological and those who are truly pathological, what is the bootstrapped mean baseline heart rate for each class? State your assumptions.
+
+*Solution:*
+
+## c) {-}
+
 
 ```{r}
 # Question 3
