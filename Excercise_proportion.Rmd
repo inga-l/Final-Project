@@ -1,0 +1,81 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+# Question 5 {-}
+Suppose this data represents the population of newborns in one hospital and you take a simple random sample of 100 babies from the population.
+
+a) What is the probability that your sample contains more than 25 babies has abnormal health status (1 = health, 2 = suspect, 3 = Pathological)? 
+
+```{r}
+## ---- Question-5a ------------------------------------------------------------
+
+df_fh <- readr::read_csv(here::here("fetal_health.csv"))
+library(dplyr)
+library(tidyr)
+library(mosaic)
+
+df_fh %>%
+  select(fetal_health)%>%
+  filter(fetal_health != 1)%>%
+  nrow()
+
+#there are 471 abnormal in this population
+
+#the probability of having abnormal is 471/2126 = 0.22
+
+1 - mosaic::xpbinom(q = 25, size = 100, prob = 0.22)
+
+```
+The probability of having more than 30 abnormal is 0.197. 
+
+b) Turns out that your sample actually contains 20 babies with abnormal health status. What is the 95% confidence interval of this proportion? Can you use a normal approximation for this sample? Why or why not?
+```{r}
+## ---- Question-5b ------------------------------------------------------------
+
+mosaic::binom.test(x = 200, n = 1000, ci.method = "Clopper-Pearson")
+mosaic::binom.test(x = 200, n = 1000, ci.method = "Wald")
+
+mosaic::binom.test(x = 20, n = 100, ci.method = "Clopper-Pearson")
+mosaic::binom.test(x = 20, n = 100, ci.method = "Wald")
+```
+The 95% CI using Clopper-Pearson method: [0.1266556,0.2918427]
+The 95% CI using exact method(ie: normal approximation): [0.1216014,0.2783986]
+The two methods give similar 95% CIs. Normal approximation can be used here since the sample size is large enough to generate a binomial distribution approximating the normal distribution and for CLT to kick in. 
+
+c) Another sample taken have the same proportion of event but the sample size is now only 10 and the count of abnormal is 2. Calculate the 95% CI using this sample and compare it with the one you have in b). Describe their difference and the reason why. 
+```{r}
+## ---- Question-5c ------------------------------------------------------------
+
+mosaic::binom.test(x = 2, n = 10, ci.method = "Clopper-Pearson")
+```
+The 95% CI for this sample is: [0.02521073, 0.55609546].
+95% CI in c) with sample size = 10 is wider than the 95% CI in b) with sample size = 100. 
+The sample size is different so the standard error is different. The 95% CI is calculated using the formula: 
+$$
+\bar y - 1.96(\frac {\sigma} {\sqrt n}) , \bar y + 1.96(\frac {\sigma} {\sqrt n}) 
+$$
+If the sample size n is larger, the standard error(sigma/sqrt n) is smaller. The value 1.96*standard error is also smaller, and results in a narrower confident interval.
+
+
+\newpage
+
+
+\vspace{1.5in}
+
+```{r, echo=TRUE}
+## --------------------------- End -------------------------------
+```
+
+
+
+\newpage
+
+
+# Code {-}
+
+```{r all-code, ref.label=knitr::all_labels(), echo = TRUE, eval = FALSE}
+# Attach this code to Question 7
+```
+
