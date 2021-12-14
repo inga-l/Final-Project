@@ -120,6 +120,8 @@ Solution: The bootstrapping method
 
 Your sister is also concerned that her baby does not move as much, which could be a sign of unhealthy pregnancy.
 
+X-axis in log scale.
+
 ```{r}
 
 df_fh %>% 
