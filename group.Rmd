@@ -1,0 +1,232 @@
+---
+title: "Final Project"
+author: "Ingrid J. Lu 260773949;"
+date: "28/10/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+## ---- Setup -----------------------------------------------------------------
+knitr::opts_chunk$set(
+warning = FALSE,
+message = FALSE,
+cache = FALSE,
+fig.align = "center",
+fig.asp = 1
+)
+
+library(pacman)
+p_load(ggplot2, tidyverse, here, readxl, mosaic, pwr, ggpubr, car)
+theme_set(theme_light())
+```
+
+```{r}
+# Set-up
+df_fh <- readr::read_csv(here::here("fetal_health.csv")) %>% 
+  select(!starts_with("histogram"))
+```
+# Background
+Your sister and her partner are expecting a child soon, and she just went to her obstetrician for her routine check. Because she in her second trimester, her obstetrician asks her to do a fetal cardiogram. The results will not get back to her until a week later. Your sister is a bit of a hypochondriac, so she is afraid that there is something wrong with her child. 
+
+So, her partner turns to you, a Masters student who is studying inferential statistics for health, hoping to find some results to calm your sister down.
+
+Luckily, you have identified a publicly available dataset that includes thousands of fetal cardiogram results, and the classification of these babies’ health status. You need to convince your sister that she and her child will be safe.
+
+Note: the objective of this exercise is to consolidate all the important concepts covered in EPIB607. When answer each question, be sure to include any units and assumptions and define all parameters, when appropriate. The following questions are based on the publicly available dataset ["Fetal Classification"](https://archive.ics.uci.edu/ml/datasets/cardiotocography), please find all attribute information of the data from the link.
+
+# Question 1 Data Visualization and Summary Statistics
+
+## a) {-}
+Is this data tidy? If no, transform it into an untidy data. If yes, provide an explanation.
+
+*Solution:*
+
+## b) {-}
+Looking at the 3 different classification of fetal health status and each fetus' baseline heart rate provide an appropriate graphic summarizing the distribution of each of baseline heart rates for each class. Be sure to provide the correct title and label for the plot.
+
+*Solution:*
+
+```{r}
+# Question 1
+
+# 1.b
+df_fh$fetal_health <- ifelse(df_fh$fetal_health == 1, 
+                             "Normal", 
+                             ifelse(df_fh$fetal_health == 2, 
+                                    "Suspect", 
+                                    "Pathological"))
+
+df_fh %>% 
+  group_by(fetal_health) %>%
+  ggplot(aes(x = fetal_health, y = `baseline value`)) +
+  geom_boxplot()
+```
+
+## c) {-}
+Comment on the boxplot, what are the characteristics of each category?
+
+## d) {-}
+
+Describe the distribution of the baseline heart rate for all participants in this sample, is the baseline heart rate normally distributed, comment on any skewness. What about each class? Use an appropriate graph to answer this question.
+
+*Solution:*
+
+```{r}
+## 1.d
+
+df_fh %>% 
+  ggplot(aes(x = `baseline value`))+
+  geom_density()
+
+df_fh %>% 
+  ggplot(aes(x = `baseline value`, fill = fetal_health))+
+  geom_density(alpha = 0.5)
+
+```
+
+# Question 2
+
+## a) {-}
+
+What is the mean uterine contraction for each class?
+
+*Solution:*
+
+```{r}
+# Question 2
+df_fh_n <- df_fh %>% filter(fetal_health == "Normal")
+mean(df_fh_n$uterine_contractions)
+
+df_fh_s <- df_fh %>% filter(fetal_health == "Suspect")
+mean(df_fh_s$uterine_contractions)
+
+df_fh_p <- df_fh %>% filter(fetal_health == "Pathological")
+mean(df_fh_p$uterine_contractions)
+```
+
+## b) {-}
+
+Since we have a small sample size for those who are suspected to be pathological and those who are truly pathological, what is one method that we can use to artificially create a pseudo-population and calculate the median of these two groups? State your assumptions.
+
+*Solution:*  Bootstrapping
+
+## c) {-}
+
+What is one weakness of using the bootstrapping method?
+
+Solution: The bootstrapping method 
+
+## d) {-}
+
+Your sister is also concerned that her baby does not move as much, which could be a sign of unhealthy pregnancy.
+
+X-axis in log scale.
+
+```{r}
+
+df_fh %>% 
+  ggplot(aes(x = fetal_movement, fill = fetal_health))+
+  geom_density(alpha = 0.5) + 
+  scale_x_log10()
+
+```
+
+```{r}
+# Question 3
+```
+
+```{r}
+# Question 4
+```
+
+# Question 5 
+Suppose this data represents the population of newborns in one hospital and you take a simple random sample of 100 babies from the population.
+
+## a) What is the probability that your sample contains more than 25 babies has abnormal health status (1 = health, 2 = suspect, 3 = Pathological)? 
+
+```{r}
+## ---- Question-5a ------------------------------------------------------------
+df_fh <- readr::read_csv(here::here("fetal_health.csv"))
+library(dplyr)
+library(tidyr)
+library(mosaic)
+df_fh %>%
+  select(fetal_health)%>%
+  filter(fetal_health != 1)%>%
+  nrow()
+#there are 471 abnormal in this population
+#the probability of having abnormal is 471/2126 = 0.22
+1 - mosaic::xpbinom(q = 25, size = 100, prob = 0.22)
+```
+The probability of having more than 30 abnormal is 0.197. 
+
+## b) Turns out that your sample actually contains 20 babies with abnormal health status. What is the 95% confidence interval of this proportion? Can you use a normal approximation for this sample? Why or why not?
+```{r}
+## ---- Question-5b ------------------------------------------------------------
+mosaic::binom.test(x = 200, n = 1000, ci.method = "Clopper-Pearson")
+mosaic::binom.test(x = 200, n = 1000, ci.method = "Wald")
+mosaic::binom.test(x = 20, n = 100, ci.method = "Clopper-Pearson")
+mosaic::binom.test(x = 20, n = 100, ci.method = "Wald")
+```
+The 95% CI using Clopper-Pearson method: [0.127,0.292]
+The 95% CI using exact method(ie: normal approximation): [0.122,0.278]
+The two methods give similar 95% CIs. Normal approximation can be used here since the sample size is large enough to generate a binomial distribution approximating the normal distribution and for CLT to kick in. 
+
+## c) Another sample taken have the same proportion of event but the sample size is now only 10 and the count of abnormal is 2. Calculate the 95% CI using this sample and compare it with the one you have in b). Describe their difference and the reason why. 
+```{r}
+## ---- Question-5c ------------------------------------------------------------
+mosaic::binom.test(x = 2, n = 10, ci.method = "Clopper-Pearson")
+```
+The 95% CI for this sample is: [0.0252, 0.556].
+95% CI in c) with sample size = 10 is wider than the 95% CI in b) with sample size = 100. 
+The sample size is different so the standard error is different. The 95% CI is calculated using the formula: 
+$$
+\bar y - 1.96(\frac {\sigma} {\sqrt n}) , \bar y + 1.96(\frac {\sigma} {\sqrt n}) 
+$$
+If the sample size n is larger, the standard error(sigma/sqrt n) is smaller. The value 1.96*standard error is also smaller, and results in a narrower confident interval.
+
+
+\newpage
+
+```{r}
+# Question 6
+```
+
+## a) Some said that the Fetal Heart Rate may reflect a lower value of short term variability. Can you conduct a linear regression to test it? Is it significant?
+
+*Solution:*
+
+```{r}
+reg1 <- lm(mean_value_of_long_term_variability ~ `baseline value`, data = df_fh)
+summary(reg1)
+```
+According to the linear regression, there is no significant association between baseline heart rate and value of short term variability. 
+
+## b) If you want to use a logistic regression model to use **Number of fetal movements per second** to the predict the classification of fetal health outcome. Describe how will you process these three variables to fit a logistic regression. 
+
+*Solution:*
+
+
+1. In a logistic regression, the outcome variable is binary variable. In this example, the fetal health outcome will be classified as Pathological, and non-pathological (including normal and suspect). 
+
+2. We will find cut points for the Number of fetal movements per second based on previous literature and hypothesis. 
+
+
+## c)  Suppose the normal number of fetal movements per second is within 0.01. Fit the logistic regression model and provide a 95% CI. 
+
+```{r}
+df_fh$f_mov <- ifelse(df_fh$fetal_movement>0.01, 1, 0)
+```
+
+```{r}
+df_fh$f_patho <- ifelse(df_fh$fetal_health==3, 1 , 0)
+```
+
+```{r}
+reg2 <- glm(f_patho~ f_mov, family = binomial (link = "logit"), data = df_fh)
+summary(reg2)
+```
+```{r}
+exp(confint(reg2))
+```
+
