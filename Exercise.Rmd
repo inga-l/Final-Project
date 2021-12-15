@@ -16,7 +16,7 @@ fig.asp = 1
 )
 
 library(pacman)
-p_load(ggplot2, tidyverse, here, readxl, mosaic, pwr, ggpubr, car)
+p_load(ggplot2, tidyverse, here, readxl, mosaic, pwr, ggpubr, car, pROC)
 theme_set(theme_light())
 ```
 
@@ -293,7 +293,7 @@ df_fh$f_mov <- ifelse(df_fh$fetal_movement>0.01, 1, 0)
 ```
 
 ```{r}
-df_fh$f_patho <- ifelse(df_fh$fetal_health==3, 1 , 0)
+df_fh$f_patho <- ifelse(df_fh$fetal_health=="Pathological", 1 , 0)
 ```
 
 ```{r}
@@ -302,10 +302,27 @@ summary(reg2)
 ```
 
 ```{r}
-confint_upper <- 0.43339 + 1.96*0.22181
-confint_upper <- round(exp(confint_upper),3)
-confint_lower <- 0.43339 - 1.96*0.22181
-confint_lower <- round(exp(confint_lower),3)
+exp(confint(reg2))
+```
 
-paste(confint_lower, confint_upper)
+# Question 7 
+
+
+```{r}
+df_fh$ab_var <- ifelse(
+  df_fh$percentage_of_time_with_abnormal_long_term_variability == 0, 0, 1)
+
+reg3 <- glm(f_patho ~ f_mov + ab_var, family = binomial (link = "logit"), data = df_fh)
+summary(reg3)
+
+rocobj1 <- plot.roc(df_fh$f_mov, fitted(reg3),
+                    percent=TRUE,
+                    ci=TRUE, # compute AUC (of AUC by default)
+                    print.auc=TRUE)
+
+ciobj <- ci.se(rocobj1, # CI of sensitivity
+               specificities=seq(0, 100, 5)) # over a select set of specificities
+plot(ciobj, type="shape", col="#1c61b6AA") # plot as a blue shape
+plot(ci(rocobj1, of="thresholds", thresholds="best")) # add one threshold
+
 ```
