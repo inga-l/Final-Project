@@ -1,6 +1,6 @@
 ---
 title: "Final Project"
-author: "Ingrid J. Lu 260773949; Grace Ma ; Xinbei Wan 260777034; Wanqi Wang"
+author: "Ingrid J. Lu 260773949; Grace Ma 260761707 ; Xinbei Wan 260777034; Wanqi Wang"
 date: "`r paste('compiled on',format(Sys.time(), '%B %d, %Y'))`"
 output: pdf_document
 ---
@@ -266,7 +266,7 @@ If the sample size n is larger, the standard error(sigma/sqrt n) is smaller. The
 # Question 5.2 {-}
 You continue to work with the simple random sample. This time you take 100 babies from the a different hospital as the sample from the population. 
 
-a) Your sample contains 30 babies with abnormal health status. What is the rate and 95% CI of health abnormality? Interpret your result. 
+## a) Your sample contains 30 babies with abnormal health status. What is the rate and 95% CI of health abnormality? Interpret your result. 
 
 ```{r}
 ## ---- Question-6a ------------------------------------------------------------
@@ -278,7 +278,7 @@ Rate: 0.3
 95% CI: [0.20,0.43]
 There is a 95% chance that the confidence interval [0.20,0.43] captures the true rate.
 
-b) According to the data of the population with 2126 babies, 471 babies have abnormal health status. The expectation of the baby having abnormal health status of the original hospital is only 0.22. 
+## b) According to the data of the population with 2126 babies, 471 babies have abnormal health status. The expectation of the baby having abnormal health status of the original hospital is only 0.22. 
 Does your sample suggest that the babies coming from two hospitals have significantly different rate of abnormal health? Calculate the 95% CI for the rate ratio both by hand and using a one-step canned function. 
 
 ```{r}
@@ -289,8 +289,6 @@ stats::poisson.test(x = 30, T = 100)
 0.4282687/0.22
 
 stats::poisson.test(x = 30, T = 471/2126*100)
-
-
 
 ```
 
