@@ -1,7 +1,7 @@
 ---
 title: "Final Project"
-author: "Ingrid J. Lu 260773949;"
-date: "28/10/2021"
+author: "Ingrid J. Lu 260773949; Grace Ma ; Xinbei Wan 260777034; Wanqi Wang"
+date: "`r paste('compiled on',format(Sys.time(), '%B %d, %Y'))`"
 output: pdf_document
 ---
 
@@ -264,6 +264,8 @@ If the sample size n is larger, the standard error(sigma/sqrt n) is smaller. The
 
 \newpage
 
+# Question 6
+
 ## a) Some said that the Fetal Heart Rate may reflect a lower value of short term variability. Can you conduct a linear regression to test it? Is it significant?
 
 *Solution:*
@@ -300,5 +302,10 @@ summary(reg2)
 ```
 
 ```{r}
-exp(confint(reg2))
+confint_upper <- 0.43339 + 1.96*0.22181
+confint_upper <- round(exp(confint_upper),3)
+confint_lower <- 0.43339 - 1.96*0.22181
+confint_lower <- round(exp(confint_lower),3)
+
+paste(confint_lower, confint_upper)
 ```
