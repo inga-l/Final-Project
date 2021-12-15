@@ -1,6 +1,6 @@
 ---
 title: "Final Project"
-author: "Ingrid J. Lu 260773949; Grace Ma ; Xinbei Wan 260777034; Wanqi Wang"
+author: "Ingrid J. Lu 260773949; Grace Ma 260761707 ; Xinbei Wan 260777034; Wanqi Wang"
 date: "`r paste('compiled on',format(Sys.time(), '%B %d, %Y'))`"
 output: pdf_document
 ---
@@ -219,7 +219,7 @@ prop.table(table(power_distribution))
 
 The percentage of samples that results in a p-value less than 0.05 is 85.4%, which shows the study is powered at 85% to detect the difference.
 
-# Question 5 
+# Question 5.1 {-}
 Suppose this data represents the population of newborns in one hospital and you take a simple random sample of 100 babies from the population.
 
 ## a) What is the probability that your sample contains more than 25 babies has abnormal health status (1 = health, 2 = suspect, 3 = Pathological)? 
@@ -239,8 +239,7 @@ The probability of having more than 30 abnormal is 0.197.
 ## b) Turns out that your sample actually contains 20 babies with abnormal health status. What is the 95% confidence interval of this proportion? Can you use a normal approximation for this sample? Why or why not?
 ```{r}
 ## ---- Question-5b ------------------------------------------------------------
-mosaic::binom.test(x = 200, n = 1000, ci.method = "Clopper-Pearson")
-mosaic::binom.test(x = 200, n = 1000, ci.method = "Wald")
+
 mosaic::binom.test(x = 20, n = 100, ci.method = "Clopper-Pearson")
 mosaic::binom.test(x = 20, n = 100, ci.method = "Wald")
 ```
@@ -261,6 +260,41 @@ $$
 $$
 If the sample size n is larger, the standard error(sigma/sqrt n) is smaller. The value 1.96*standard error is also smaller, and results in a narrower confident interval.
 
+\newpage
+
+
+# Question 5.2 {-}
+You continue to work with the simple random sample. This time you take 100 babies from the a different hospital as the sample from the population. 
+
+## a) Your sample contains 30 babies with abnormal health status. What is the rate and 95% CI of health abnormality? Interpret your result. 
+
+```{r}
+## ---- Question-6a ------------------------------------------------------------
+
+stats::poisson.test(x = 30, T = 100)
+```
+
+Rate: 0.3
+95% CI: [0.20,0.43]
+There is a 95% chance that the confidence interval [0.20,0.43] captures the true rate.
+
+## b) According to the data of the population with 2126 babies, 471 babies have abnormal health status. The expectation of the baby having abnormal health status of the original hospital is only 0.22. 
+Does your sample suggest that the babies coming from two hospitals have significantly different rate of abnormal health? Calculate the 95% CI for the rate ratio both by hand and using a one-step canned function. 
+
+```{r}
+## ---- Question-6a ------------------------------------------------------------
+
+stats::poisson.test(x = 30, T = 100)
+0.2024087/0.22 
+0.4282687/0.22
+
+stats::poisson.test(x = 30, T = 471/2126*100)
+
+```
+
+95% CI by hand: [0.92.1.95]
+95% CI by canned function: [0.91,0.933]
+According to the Poisson test and by hand calculation, two 95% CI for the rate ratio both contains the null value 1. The 95% CI and the p-value suggests that the difference between two hospitals is not statistically significant. 
 
 \newpage
 
