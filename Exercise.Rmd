@@ -239,8 +239,7 @@ The probability of having more than 30 abnormal is 0.197.
 ## b) Turns out that your sample actually contains 20 babies with abnormal health status. What is the 95% confidence interval of this proportion? Can you use a normal approximation for this sample? Why or why not?
 ```{r}
 ## ---- Question-5b ------------------------------------------------------------
-mosaic::binom.test(x = 200, n = 1000, ci.method = "Clopper-Pearson")
-mosaic::binom.test(x = 200, n = 1000, ci.method = "Wald")
+
 mosaic::binom.test(x = 20, n = 100, ci.method = "Clopper-Pearson")
 mosaic::binom.test(x = 20, n = 100, ci.method = "Wald")
 ```
