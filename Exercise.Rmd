@@ -264,6 +264,41 @@ If the sample size n is larger, the standard error(sigma/sqrt n) is smaller. The
 
 \newpage
 
+## a) Some said that the Fetal Heart Rate may reflect a lower value of short term variability. Can you conduct a linear regression to test it? Is it significant?
+
+*Solution:*
+
 ```{r}
-# Question 6
+reg1 <- lm(mean_value_of_long_term_variability ~ `baseline value`, data = df_fh)
+summary(reg1)
+```
+According to the linear regression, there is no significant association between baseline heart rate and value of short term variability. 
+
+## b) If you want to use a logistic regression model to use **Number of fetal movements per second** to the predict the classification of fetal health outcome. Describe how will you process these three variables to fit a logistic regression. 
+
+*Solution:*
+
+
+1. In a logistic regression, the outcome variable is binary variable. In this example, the fetal health outcome will be classified as Pathological, and non-pathological (including normal and suspect). 
+
+2. We will find cut points for the Number of fetal movements per second based on previous literature and hypothesis. 
+
+
+## c)  Suppose the normal number of fetal movements per second is within 0.01. Fit the logistic regression model and provide a 95% CI. 
+
+```{r}
+df_fh$f_mov <- ifelse(df_fh$fetal_movement>0.01, 1, 0)
+```
+
+```{r}
+df_fh$f_patho <- ifelse(df_fh$fetal_health==3, 1 , 0)
+```
+
+```{r}
+reg2 <- glm(f_patho~ f_mov, family = binomial (link = "logit"), data = df_fh)
+summary(reg2)
+```
+
+```{r}
+exp(confint(reg2))
 ```
