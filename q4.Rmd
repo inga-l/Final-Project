@@ -1,0 +1,67 @@
+---
+title: "Q4"
+author: "Xinbei Wan"
+date: "14/12/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Question 4. p-value, power {-}
+
+For the purpose of this question only, we treat the 2126 individuals as **the entire target population of newborns**. 
+
+## 1) Calculate the mean and standard deviation of the baseline fetal heart rate.
+
+```{r}
+fetal_health <- readr::read_csv(here::here("fetal_health.csv"))
+mean_hr <- mean(fetal_health$`baseline value`)
+mean_hr
+sd_hr <- sqrt(var(fetal_health$`baseline value`)*(length(fetal_health$`baseline value`)-1)/length(fetal_health$`baseline value`))
+sd_hr
+```
+
+## 2) It is claimed that the baseline fetal heart rates of fetuses with "suspect" health status are above average. Take a simple random sample of 10 fetuses with "suspect" health status, and measure their heart rate to obtain a sample mean of 141.68. Heart rates are scaled to be normally distributed. Does the sample provide evidence to reject null hypothesis? State your null and alternative hypothesis.
+
+```{r}
+pnorm(q = 141.68, mean = 133.30, sd = 9.84/sqrt(10), lower.tail = FALSE)
+```
+
+$H_0: \mu = 133.30$, $H_A: \mu > 133.30$
+
+The p-value of one sided test is 0.0035. This sample provides evidence against the null hypothesis. The p-value tells us the probability of observing the sample size mean of 141.68 under the null hypothesis distribution is very unlikely.
+
+## 3) What power do you have to detect the baseline fetal heart rates of fetuses with "suspect" health status are at least 8.38 heart beats higher than average, using a one-sided test and sample size 10 and a 0.05 level test?
+
+$H_0: \mu = 133.30$, $H_A: \mu > 141.30$
+```{r}
+# cutoff to reject the null
+cutoff <- qnorm(p = 0.95, mean = 133.30, sd = 9.84/sqrt(10))
+cutoff
+# probability of observing this cutoff or greater under the alternative
+pnorm(q = cutoff, mean = 141.68, sd = 9.84/sqrt(10), lower.tail = FALSE)
+```
+
+## 4) A sample size of 10 fetuses with "suspect" health status will have at least 85% power to detect a difference of 8.38 heart beats. Use a simulation based approach to reproduce the sample size calculation for the baseline fetal heart rates of fetuses with "suspect" health status and average.
+
+```{r}
+set.seed(490)
+
+power_distribution <- replicate(n = 1000, expr={
+  sample.size <- 10
+  
+  suspect <- rnorm(sample.size, mean = 141.68, sd = 9.83)
+  SEM <- sd(suspect)/sqrt(sample.size)
+  
+  pnorm(q = mean(suspect), mean = 133.30, sd =SEM, lower.tail = FALSE) < 0.05
+
+} )
+
+prop.table(table(power_distribution))
+```
+
+The percentage of samples that results in a p-value less than 0.05 is 85.4%, which shows the study is powered at 85% to detect the difference.
+
+
