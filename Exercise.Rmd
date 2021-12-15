@@ -117,7 +117,7 @@ Since we have a small sample size for those who are suspected to be pathological
 *Solution:*  Bootstrapping
 
 ```{r}
-B <- 10000
+B <- 1000
 set.seed(3949)
 
 R_s <- replicate(B, { # first argument, # of replicates
