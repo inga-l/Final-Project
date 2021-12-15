@@ -16,15 +16,10 @@ fig.asp = 1
 )
 
 library(pacman)
-p_load(ggplot2, tidyverse, here, readxl, mosaic, pwr, ggpubr, car, pROC)
+p_load(ggplot2, tidyverse, here, readxl, RColorBrewer, mosaic, pwr, ggpubr, car, pROC)
 theme_set(theme_light())
 ```
 
-```{r}
-# Set-up
-df_fh <- readr::read_csv(here::here("fetal_health.csv")) %>% 
-  select(!starts_with("histogram"))
-```
 # Background
 Your sister and her partner are expecting a child soon, and she just went to her obstetrician for her routine check. Because she in her second trimester, her obstetrician asks her to do a fetal cardiogram. The results will not get back to her until a week later. Your sister is a bit of a hypochondriac, so she is afraid that there is something wrong with her child. 
 
@@ -34,15 +29,23 @@ Luckily, you have identified a publicly available dataset that includes thousand
 
 Note: the objective of this exercise is to consolidate all the important concepts covered in EPIB607. When answer each question, be sure to include any units and assumptions and define all parameters, when appropriate. The following questions are based on the publicly available dataset ["Fetal Classification"](https://archive.ics.uci.edu/ml/datasets/cardiotocography), please find all attribute information of the data from the link.
 
+Use the following code to set-up your dataframe:
+
+```{r}
+# Set-up
+df_fh <- readr::read_csv(here::here("fetal_health.csv")) %>% 
+  select(!starts_with("histogram"))
+```
+
 # Question 1 Data Visualization and Summary Statistics
 
 ## a) {-}
-Is this data tidy? If no, transform it into an untidy data. If yes, provide an explanation.
+Is this data ready for you to work with? If no, transform it into a ready to use form, if yes, explain.
 
-*Solution:*
+*Solution:* Yes, this data is ready to use because it is in a tidy format. Each column is a variable and each row is one observation. Each cell contains 1 value of the variable.
 
 ## b) {-}
-Looking at the 3 different classification of fetal health status and each fetus' baseline heart rate provide an appropriate graphic summarizing the distribution of each of baseline heart rates for each class. Be sure to provide the correct title and label for the plot.
+Looking at the 3 different classification of fetal health status and each fetus' baseline heart rate, provide an appropriate graphic summarizing the distribution of each of baseline heart rates for each class. Be sure to provide the correct title and label for the plot.
 
 *Solution:*
 
@@ -59,28 +62,50 @@ df_fh$fetal_health <- ifelse(df_fh$fetal_health == 1,
 df_fh %>% 
   group_by(fetal_health) %>%
   ggplot(aes(x = fetal_health, y = `baseline value`)) +
-  geom_boxplot()
+  geom_boxplot() + 
+  labs(title = "Baseline fetal heart rate by health classification", 
+       x = "Fetal health classification",
+       y = "Baseline heart rate (beats/min)")
+
 ```
 
 ## c) {-}
 Comment on the boxplot, what are the characteristics of each category?
 
+*Solution:* 
+
 ## d) {-}
 
-Describe the distribution of the baseline heart rate for all participants in this sample, is the baseline heart rate normally distributed, comment on any skewness. What about each class? Use an appropriate graph to answer this question.
+Your sister is concerned that her baby does not move as much, which could be a sign of an unhealthy pregnancy. 
+
+Use a density graph, show her the distribution of fetal movements according to different fetal health classifications. Interpret to her the meaning of the box plots.
 
 *Solution:*
 
 ```{r}
 ## 1.d
 
-df_fh %>% 
-  ggplot(aes(x = `baseline value`))+
-  geom_density()
+df_fh %>%
+  ggplot(aes(x = fetal_movement, fill = fetal_health))+
+  geom_density(alpha = 0.5) +
+  scale_x_log10()
 
-df_fh %>% 
-  ggplot(aes(x = `baseline value`, fill = fetal_health))+
-  geom_density(alpha = 0.5)
+```
+
+## e)
+
+Your sister's partner tells you that he is colourblind, please fix the graph produced above to provide him with a colourblind-friendly graph.
+
+*Solution:* We can use the "RColorBrewer" package and look for a colourblind-friendly palette. Then apply the package to our ggplot.
+
+```{r}
+display.brewer.all(colorblindFriendly = TRUE)
+
+df_fh %>%
+  ggplot(aes(x = fetal_movement, fill = fetal_health))+
+  geom_density(alpha = 0.5) +
+  scale_x_log10() + 
+  scale_fill_brewer(palette="Set2")
 
 ```
 
@@ -105,7 +130,7 @@ mean(df_fh_s$uterine_contractions)
 df_fh_p <- df_fh %>% filter(fetal_health == "Pathological")
 mean(df_fh_p$uterine_contractions)
 ```
-Looking at the mean, this statement is not true. The Normal category has the highest number of mean uterine contractions. And the mean uterine contraction in the Pathological category is lower than the mean in the Normal category. The Suspect category has the lowest mean uterine contractino out of the three classes.
+Looking at the mean, this statement is not true. The Normal category has the highest number of mean uterine contractions. And the mean uterine contraction in the Pathological category is lower than the mean in the Normal category. The Suspect category has the lowest mean uterine contraction out of the three classes.
 
 Nevertheless, further testing is required to confirm this observation.
 
@@ -114,7 +139,7 @@ Nevertheless, further testing is required to confirm this observation.
 
 Since we have a small sample size for those who are suspected to be pathological and those who are determined to be pathological, what is one method that we can use to artificially create a pseudo-population and calculate the median of these two groups? State your assumptions.
 
-*Solution:*  Bootstrapping
+*Solution:*  Bootstrapping, the assumptions are simple random sampling and the samples are representative of the population.
 
 ```{r}
 B <- 1000
@@ -143,33 +168,16 @@ mean(R_p)
 
 What is one weakness of using the bootstrapping method?
 
-Solution: The bootstrapping method assumes that the sample is representative of the whole population. However, when we have a small sample size, that is not always the case. There could be sampling errors which can skew the distribution of the sample. And the bootstrapping method cannot correct this error as it can only sample within this small set of data. As the saying goes, "garbage in, garbage out". If the sample is not representative of the population, the results obtained from bootstrap will not be accurate and will result in an incorrect inference of the population parameter.
+*Solution:* The bootstrapping method assumes that the sample is representative of the whole population. However, when we have a small sample size, that is not always the case. There could be sampling errors which can skew the distribution of the sample. And the bootstrapping method cannot correct this error as it can only sample within this small set of data. As the saying goes, "garbage in, garbage out". If the sample is not representative of the population, the results obtained from bootstrap will not be accurate and will result in an incorrect inference of the population parameter.
 
-## d) {-}
 
-Your sister is also concerned that her baby does not move as much, which could be a sign of unhealthy pregnancy.
-
-Transform x-axis to a logarithmic scale.
-
-```{r}
-# 2.d
-
-df_fh %>% 
-  ggplot(aes(x = fetal_movement, fill = fetal_health))+
-  geom_density(alpha = 0.5) + 
-  scale_x_log10()
-
-```
-
-```{r}
-# Question 3
-```
-
-# Question 4. p-value, power {-}
+# Question 3. p-value, power {-}
 
 For the purpose of this question only, we treat the 2126 individuals as **the entire target population of newborns**. 
 
-## 1) Calculate the mean and standard deviation of the baseline fetal heart rate.
+## a) {-}
+
+Calculate the mean and standard deviation of the baseline fetal heart rate.
 
 ```{r}
 mean_hr <- mean(df_fh$`baseline value`)
@@ -178,7 +186,9 @@ sd_hr <- sqrt(var(df_fh$`baseline value`)*(length(df_fh$`baseline value`)-1)/len
 sd_hr
 ```
 
-## 2) It is claimed that the baseline fetal heart rates of fetuses with "suspect" health status are above average. Take a simple random sample of 10 fetuses with "suspect" health status, and measure their heart rate to obtain a sample mean of 141.68. Heart rates are scaled to be normally distributed. Does the sample provide evidence to reject null hypothesis? State your null and alternative hypothesis.
+## b) {-}
+
+Your sister claimed that, she read on a magazine, that the baseline fetal heart rates of fetuses with "suspect" health status are above average. Take a simple random sample of 10 fetuses with "suspect" health status, and measure their heart rate to obtain a sample mean of 141.68. Heart rates are scaled to be normally distributed. Does the sample provide evidence to reject null hypothesis? State your null and alternative hypothesis.
 
 ```{r}
 pnorm(q = 141.68, mean = 133.30, sd = 9.84/sqrt(10), lower.tail = FALSE)
@@ -188,7 +198,9 @@ $H_0: \mu = 133.30$, $H_A: \mu > 133.30$
 
 The p-value of one sided test is 0.0035. This sample provides evidence against the null hypothesis. The p-value tells us the probability of observing the sample size mean of 141.68 under the null hypothesis distribution is very unlikely.
 
-## 3) What power do you have to detect the baseline fetal heart rates of fetuses with "suspect" health status are at least 8.38 heart beats higher than average, using a one-sided test and sample size 10 and a 0.05 level test?
+## c) {-}
+
+So your sister asks you now, what is the probability that you can detect the baseline fetal heart rates of fetuses with "suspect" health status are at least 8.38 heart beats higher than average, using a one-sided test and sample size 10 and a 0.05 level test?
 
 $H_0: \mu = 133.30$, $H_A: \mu > 141.30$
 ```{r}
@@ -199,7 +211,9 @@ cutoff
 pnorm(q = cutoff, mean = 141.68, sd = 9.84/sqrt(10), lower.tail = FALSE)
 ```
 
-## 4) A sample size of 10 fetuses with "suspect" health status will have at least 85% power to detect a difference of 8.38 heart beats. Use a simulation based approach to reproduce the sample size calculation for the baseline fetal heart rates of fetuses with "suspect" health status and average.
+## d) {-}
+
+A sample size of 10 fetuses with "suspect" health status will have at least 85% power to detect a difference of 8.38 heart beats. Use a simulation based approach to reproduce the sample size calculation for the baseline fetal heart rates of fetuses with "suspect" health status and average.
 
 ```{r}
 set.seed(490)
@@ -219,10 +233,13 @@ prop.table(table(power_distribution))
 
 The percentage of samples that results in a p-value less than 0.05 is 85.4%, which shows the study is powered at 85% to detect the difference.
 
-# Question 5.1 {-}
-Suppose this data represents the population of newborns in one hospital and you take a simple random sample of 100 babies from the population.
+# Question 4.1 {-}
 
-## a) What is the probability that your sample contains more than 25 babies has abnormal health status (1 = health, 2 = suspect, 3 = Pathological)? 
+Suppose this data represents the **population of newborns in one hospital** and you take a simple random sample of 100 babies from the population.
+
+## a) {-}
+
+What is the probability that your sample contains more than 25 babies has abnormal health status (1 = health, 2 = suspect, 3 = Pathological)? 
 
 ```{r}
 ## ---- Question-5a ------------------------------------------------------------
@@ -236,7 +253,9 @@ df_fh %>%
 ```
 The probability of having more than 30 abnormal is 0.197. 
 
-## b) Turns out that your sample actually contains 20 babies with abnormal health status. What is the 95% confidence interval of this proportion? Can you use a normal approximation for this sample? Why or why not?
+## b) {-} 
+
+Turns out that your sample actually contains 20 babies with abnormal health status. What is the 95% confidence interval of this proportion? Can you use a normal approximation for this sample? Why or why not?
 ```{r}
 ## ---- Question-5b ------------------------------------------------------------
 
@@ -247,7 +266,9 @@ The 95% CI using Clopper-Pearson method: [0.127,0.292]
 The 95% CI using exact method(ie: normal approximation): [0.122,0.278]
 The two methods give similar 95% CIs. Normal approximation can be used here since the sample size is large enough to generate a binomial distribution approximating the normal distribution and for CLT to kick in. 
 
-## c) Another sample taken have the same proportion of event but the sample size is now only 10 and the count of abnormal is 2. Calculate the 95% CI using this sample and compare it with the one you have in b). Describe their difference and the reason why. 
+## c) {-}
+
+Another sample taken have the same proportion of event but the sample size is now only 10 and the count of abnormal is 2. Calculate the 95% CI using this sample and compare it with the one you have in b). Describe their difference and the reason why. 
 ```{r}
 ## ---- Question-5c ------------------------------------------------------------
 mosaic::binom.test(x = 2, n = 10, ci.method = "Clopper-Pearson")
@@ -263,10 +284,12 @@ If the sample size n is larger, the standard error(sigma/sqrt n) is smaller. The
 \newpage
 
 
-# Question 5.2 {-}
+# Question 4.2 {-}
 You continue to work with the simple random sample. This time you take 100 babies from the a different hospital as the sample from the population. 
 
-## a) Your sample contains 30 babies with abnormal health status. What is the rate and 95% CI of health abnormality? Interpret your result. 
+## a) {-}
+
+Your sample contains 30 babies with abnormal health status. What is the rate and 95% CI of health abnormality? Interpret your result. 
 
 ```{r}
 ## ---- Question-6a ------------------------------------------------------------
@@ -278,7 +301,9 @@ Rate: 0.3
 95% CI: [0.20,0.43]
 There is a 95% chance that the confidence interval [0.20,0.43] captures the true rate.
 
-## b) According to the data of the population with 2126 babies, 471 babies have abnormal health status. The expectation of the baby having abnormal health status of the original hospital is only 0.22. 
+## b) {-}
+
+According to the data of the population with 2126 babies, 471 babies have abnormal health status. The expectation of the baby having abnormal health status of the original hospital is only 0.22. 
 Does your sample suggest that the babies coming from two hospitals have significantly different rate of abnormal health? Calculate the 95% CI for the rate ratio both by hand and using a one-step canned function. 
 
 ```{r}
@@ -298,9 +323,11 @@ According to the Poisson test and by hand calculation, two 95% CI for the rate r
 
 \newpage
 
-# Question 6
+# Question 5
 
-## a) Some said that the Fetal Heart Rate may reflect a lower value of short term variability. Can you conduct a linear regression to test it? Is it significant?
+## a) {-}
+
+Your sister's partner said, their obstetrician told them that the Fetal Heart Rate could be a reflection of a lower value of short term variability. Can you conduct a linear regression to test it? Is it significant?
 
 *Solution:*
 
@@ -310,7 +337,9 @@ summary(reg1)
 ```
 According to the linear regression, there is no significant association between baseline heart rate and value of short term variability. 
 
-## b) If you want to use a logistic regression model to use **Number of fetal movements per second** to the predict the classification of fetal health outcome. Describe how will you process these three variables to fit a logistic regression. 
+## b) {-}
+
+If you want to use a logistic regression model to use **Number of fetal movements per second** to the predict the classification of fetal health outcome. Describe how will you process these three variables to fit a logistic regression. 
 
 *Solution:*
 
@@ -320,7 +349,9 @@ According to the linear regression, there is no significant association between 
 2. We will find cut points for the Number of fetal movements per second based on previous literature and hypothesis. 
 
 
-## c)  Suppose the normal number of fetal movements per second is within 0.01. Fit the logistic regression model and provide a 95% CI. 
+## c) {-}
+
+Suppose the normal number of fetal movements per second is within 0.01. Fit the logistic regression model and provide a 95% CI. 
 
 ```{r}
 df_fh$f_mov <- ifelse(df_fh$fetal_movement>0.01, 1, 0)
@@ -339,16 +370,62 @@ summary(reg2)
 exp(confint(reg2))
 ```
 
-# Question 7 
+# Question 6
 
+## a) {-}
 
-```{r}
+You saw on another paper, that the pathological diagnosis is dependent on fetal movements and abnormal long term variability, provide a regression equation for this model. Remember to define all parameters.
+
+For the purpose of this question, code the presence and absence of abnormal long term variability as 0,1, using the percentage of time with abnormal long term variability. (0% of variability means no abnormal variability, any number higher than 0% suggests there is long term variability)
+
+*Solution:* 
+
+Regression equation:
+
+$$
+\frac{\pi}{1-\pi} = \frac{\pi_0}{1-\pi_0}*\theta_1^{mov}*\theta_2^{var}
+\begin{cases}
+      mov = 1 & \text{if movement is equal to or higher than 0.01}\\
+      mov = 0 & \text{if movement is lower than 0.01}\\
+      var = 1 & \text{if there is abnormal variability}\\
+      var = 0 & \text{if there is no abnormal variability}
+    \end{cases}
+$$
+
+$$
+log(\frac{\pi}{1-\pi}) = log(\frac{\pi_0}{1-\pi_0})+mov*log(\theta_1) + var*log(\theta_2)
+$$
+$\pi$ is the probability of receiving a pathological diagnosis
+
+$\pi_0$ is the probability of receiving a pathological diagnosis, when fetal movement is lower than 0.01 and no abnormal long-term variability
+
+$\theta_1$ is the odds ratio of receiving a pathological diagnosis, when fetal movement is equal to or higher than 0.01, adjusting for long-term variability.
+
+$\theta_2$ is the odds ratio of receiving a pathological diagnosis, when there is abnormal long-term variability, adjusting for fetal movement.
+
+$mov$ and $var$ are the risk parameters.
+
+## b) {-}
+
+Fit the regression equation, and compare the intercept value, is it different than the fitted value in Question 5.c? Why?
+
+*Solution: *
+
+``` {r}
 df_fh$ab_var <- ifelse(
   df_fh$percentage_of_time_with_abnormal_long_term_variability == 0, 0, 1)
 
 reg3 <- glm(f_patho ~ f_mov + ab_var, family = binomial (link = "logit"), data = df_fh)
 summary(reg3)
+```
 
+
+## c) {-}
+
+You decided to draw a ROC curve and see how well your model works out. Use the pROC package to draw the curve, and comment on what you see.
+
+*Solution: *
+``` {r}
 rocobj1 <- plot.roc(df_fh$f_mov, fitted(reg3),
                     percent=TRUE,
                     ci=TRUE, # compute AUC (of AUC by default)
@@ -358,5 +435,4 @@ ciobj <- ci.se(rocobj1, # CI of sensitivity
                specificities=seq(0, 100, 5)) # over a select set of specificities
 plot(ciobj, type="shape", col="#1c61b6AA") # plot as a blue shape
 plot(ci(rocobj1, of="thresholds", thresholds="best")) # add one threshold
-
 ```
