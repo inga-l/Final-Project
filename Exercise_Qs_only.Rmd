@@ -58,7 +58,7 @@ Your sister is concerned that her baby does not move as much, which could be a s
 Use a density graph, show her the distribution of fetal movements according to different fetal health classifications. You do not have to interpret this graph.
 
 
-## c)
+## c) {-}
 
 Your sister's partner tells you that he is colourblind, please fix the graph produced above to provide him with a colourblind-friendly graph.
 

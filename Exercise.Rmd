@@ -64,6 +64,11 @@ Use a density graph, show her the distribution of fetal movements according to d
 #----Question 1----------
 
 ## 1.b
+df_fh$fetal_health <- ifelse(df_fh$fetal_health == 1, 
+                             "Normal", 
+                             ifelse(df_fh$fetal_health == 2, 
+                                    "Suspect", 
+                                    "Pathological"))
 
 df_fh %>%
   ggplot(aes(x = fetal_movement, fill = fetal_health))+
@@ -72,7 +77,7 @@ df_fh %>%
 
 ```
 
-## c)
+## c) {-}
 
 Your sister's partner tells you that he is colourblind, please fix the graph produced above to provide him with a colourblind-friendly graph.
 
@@ -99,15 +104,7 @@ Looking at the 3 different classification of fetal health status and each fetus'
 *Solution:*
 
 ```{r}
-
-
 # 1.d
-df_fh$fetal_health <- ifelse(df_fh$fetal_health == 1, 
-                             "Normal", 
-                             ifelse(df_fh$fetal_health == 2, 
-                                    "Suspect", 
-                                    "Pathological"))
-
 df_fh %>% 
   group_by(fetal_health) %>%
   ggplot(aes(x = fetal_health, y = `baseline value`)) +
@@ -137,6 +134,7 @@ Is her statement true? What is the mean uterine contraction for each class?
 
 ```{r}
 #----Question 2--------------
+# 2.a
 df_fh_n <- df_fh %>% filter(fetal_health == "Normal")
 mean(df_fh_n$uterine_contractions)
 
@@ -158,6 +156,7 @@ Since we have a small sample size for those who are suspected to be pathological
 *Solution:*  Bootstrapping, the assumptions are simple random sampling and the samples are representative of the population.
 
 ```{r}
+# 2.b
 B <- 1000
 set.seed(3949)
 
@@ -196,6 +195,8 @@ For the purpose of this question only, we treat the 2126 individuals as **the en
 Calculate the mean and standard deviation of the baseline fetal heart rate.
 
 ```{r}
+#----Question 3--------------
+# 3.a
 mean_hr <- mean(df_fh$`baseline value`)
 mean_hr
 sd_hr <- sqrt(var(df_fh$`baseline value`)*(length(df_fh$`baseline value`)-1)/length(df_fh$`baseline value`))
@@ -207,6 +208,7 @@ sd_hr
 Your sister claimed that, she read on a magazine, that the baseline fetal heart rates of fetuses with "suspect" health status are above average. Take a simple random sample of 10 fetuses with "suspect" health status, and measure their heart rate to obtain a sample mean of 141.68. Heart rates are scaled to be normally distributed. Does the sample provide evidence to reject null hypothesis? State your null and alternative hypothesis.
 
 ```{r}
+# 3.b
 pnorm(q = 141.68, mean = 133.30, sd = 9.84/sqrt(10), lower.tail = FALSE)
 ```
 
@@ -220,6 +222,7 @@ So your sister asks you now, what is the probability that you can detect the bas
 
 $H_0: \mu = 133.30$, $H_A: \mu > 141.30$
 ```{r}
+# 3.c
 # cutoff to reject the null
 cutoff <- qnorm(p = 0.95, mean = 133.30, sd = 9.84/sqrt(10))
 cutoff
@@ -232,6 +235,7 @@ pnorm(q = cutoff, mean = 141.68, sd = 9.84/sqrt(10), lower.tail = FALSE)
 A sample size of 10 fetuses with "suspect" health status will have at least 85% power to detect a difference of 8.38 heart beats. Use a simulation based approach to reproduce the sample size calculation for the baseline fetal heart rates of fetuses with "suspect" health status and average.
 
 ```{r}
+# 3.d
 set.seed(490)
 
 power_distribution <- replicate(n = 1000, expr={
@@ -258,7 +262,8 @@ Suppose this data represents the **population of newborns in one hospital** and 
 What is the probability that your sample contains more than 25 babies has abnormal health status (1 = health, 2 = suspect, 3 = Pathological)? 
 
 ```{r}
-## ---- Question-5a ------------------------------------------------------------
+## ---- Question4.1------------------------------------------------------------
+# 4.1.a 
 df_fh %>%
   select(fetal_health)%>%
   filter(fetal_health != 1)%>%
@@ -273,8 +278,7 @@ The probability of having more than 30 abnormal is 0.197.
 
 Turns out that your sample actually contains 20 babies with abnormal health status. What is the 95% confidence interval of this proportion? Can you use a normal approximation for this sample? Why or why not?
 ```{r}
-## ---- Question-5b ------------------------------------------------------------
-
+# 4.1.a 
 mosaic::binom.test(x = 20, n = 100, ci.method = "Clopper-Pearson")
 mosaic::binom.test(x = 20, n = 100, ci.method = "Wald")
 ```
@@ -287,7 +291,7 @@ The two methods give similar 95% CIs. Normal approximation can be used here sinc
 Another sample taken have the same proportion of event but the sample size is now only 10 and the count of abnormal is 2. Calculate the 95% CI using this sample and compare it with the one you have in b). Describe their difference and the reason why. 
 
 ```{r}
-## ---- Question-5c ------------------------------------------------------------
+# 4.1.c
 mosaic::binom.test(x = 2, n = 10, ci.method = "Clopper-Pearson")
 ```
 The 95% CI for this sample is: [0.0252, 0.556].
@@ -309,8 +313,7 @@ You continue to work with the simple random sample. This time you take 100 babie
 Your sample contains 30 babies with abnormal health status. What is the rate and 95% CI of health abnormality? Interpret your result. 
 
 ```{r}
-## ---- Question-6a ------------------------------------------------------------
-
+# 4.2.a 
 stats::poisson.test(x = 30, T = 100)
 ```
 
@@ -324,8 +327,7 @@ According to the data of the population with 2126 babies, 471 babies have abnorm
 Does your sample suggest that the babies coming from two hospitals have significantly different rate of abnormal health? Calculate the 95% CI for the rate ratio both by hand and using a one-step canned function. 
 
 ```{r}
-## ---- Question-6a ------------------------------------------------------------
-
+# 4.1.b
 stats::poisson.test(x = 30, T = 100)
 0.2024087/0.22 
 0.4282687/0.22
@@ -349,6 +351,8 @@ Your sister's partner said, their obstetrician told them that the Fetal Heart Ra
 *Solution:*
 
 ```{r}
+#---Question 5----------------
+# 5.a
 reg1 <- lm(mean_value_of_long_term_variability ~ `baseline value`, data = df_fh)
 summary(reg1)
 ```
@@ -389,6 +393,7 @@ $mov$ is the risk parameter.
 Suppose the normal number of fetal movements per second is below 0.01. Fit the logistic regression model and provide and interpret the 95% CI for you parameter of interest. 
 
 ```{r}
+# 5.c
 df_fh$f_mov <- ifelse(df_fh$fetal_movement>0.01, 1, 0)
 df_fh$f_patho <- ifelse(df_fh$fetal_health=="Pathological", 1 , 0)
 
@@ -411,6 +416,7 @@ Can you calculate the intercept by hand? If yes, show your work, if no, explain 
 *Solution:* Using the equation $Intercept = log(\frac{\pi_0}{1-\pi_0})$, and since $\pi_0$ is the probability of receiving a pathological diagnosis, when fetal movement is lower than 0.01, we can first calculate the odds ratio of $\pi_0$ and then calculate the log this OR.
 
 ```{r}
+# 5.d
 count <- df_fh %>% 
   count(f_mov, f_patho)
 prob <- count[2,3] / (count[2,3] + count[1,3])
@@ -460,6 +466,8 @@ Fit the regression equation, and compare the intercept value, is it different th
 *Solution: *
 
 ``` {r}
+#----Question 6-----------------
+# 6.b
 df_fh$ab_var <- ifelse(
   df_fh$percentage_of_time_with_abnormal_long_term_variability == 0, 0, 1)
 
@@ -474,6 +482,7 @@ You decided to draw a ROC curve and see how well your model works out. Use the p
 
 *Solution: * According to the ROC curve, the model can predict the diagnosis very well. The AUROC is 100%, suggesting that our model can predict the diagnosis with 100% specificity and 100% sensitivity.
 ``` {r}
+# 6.c
 rocobj1 <- plot.roc(df_fh$f_mov, fitted(reg3),
                     percent=TRUE,
                     ci=TRUE, 
