@@ -1,6 +1,6 @@
 ---
 title: "Final Project"
-author: "Ingrid J. Lu 260773949; Grace Ma 260761707 ; Xinbei Wan 260777034; Wanqi Wang"
+author: "Ingrid J. Lu 260773949; Grace Ma 260761707 ; Xinbei Wan 260777034; Wanqi Wang 261023391"
 date: "`r paste('compiled on',format(Sys.time(), '%B %d, %Y'))`"
 output:   
   pdf_document:
