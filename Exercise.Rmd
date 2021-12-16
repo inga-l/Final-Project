@@ -2,7 +2,14 @@
 title: "Final Project"
 author: "Ingrid J. Lu 260773949; Grace Ma 260761707 ; Xinbei Wan 260777034; Wanqi Wang"
 date: "`r paste('compiled on',format(Sys.time(), '%B %d, %Y'))`"
-output: pdf_document
+output:   
+  pdf_document:
+    toc: false
+    number_sections: true
+    toc_depth: 4
+    highlight: pygments
+    keep_md: false
+urlcolor: blue
 ---
 
 ```{r setup, include=FALSE}
@@ -20,14 +27,15 @@ p_load(ggplot2, tidyverse, here, readxl, RColorBrewer, mosaic, pwr, ggpubr, car,
 theme_set(theme_light())
 ```
 
-# Background
+# Context {-}
+
 Your sister and her partner are expecting a child soon, and she just went to her obstetrician for her routine check. Because she in her second trimester, her obstetrician asks her to do a fetal cardiogram. The results will not get back to her until a week later. Your sister is a bit of a hypochondriac, so she is afraid that there is something wrong with her child. 
 
 So, her partner turns to you, a Masters student who is studying inferential statistics for health, hoping to find some results to calm your sister down.
 
 Luckily, you have identified a publicly available dataset that includes thousands of fetal cardiogram results, and the classification of these babies’ health status. You need to convince your sister that she and her child will be safe.
 
-Note: the objective of this exercise is to consolidate all the important concepts covered in EPIB607. When answer each question, be sure to include any units and assumptions and define all parameters, when appropriate. The following questions are based on the publicly available dataset ["Fetal Classification"](https://archive.ics.uci.edu/ml/datasets/cardiotocography), please find all attribute information of the data from the link.
+Note: the objective of this exercise is to consolidate all the important concepts covered in EPIB607. When answer each question, be sure to include any units and assumptions and define all parameters, when appropriate. The following questions are based on the publicly available dataset ["Fetal Classification"](https://www.kaggle.com/andrewmvd/fetal-health-classification), please find all attribute information of the data from the hyperlink.
 
 Use the following code to set-up your dataframe:
 
@@ -37,22 +45,63 @@ df_fh <- readr::read_csv(here::here("fetal_health.csv")) %>%
   select(!starts_with("histogram"))
 ```
 
-# Question 1 Data Visualization and Summary Statistics
+# Question 1 Data Visualization and Summary Statistics {-}
 
 ## a) {-}
-Is this data ready for you to work with? If no, transform it into a ready to use form, if yes, explain.
+Is this data ready for you to work with? If no, transform it into a ready to use form, if yes, explain why.
 
 *Solution:* Yes, this data is ready to use because it is in a tidy format. Each column is a variable and each row is one observation. Each cell contains 1 value of the variable.
 
 ## b) {-}
-Looking at the 3 different classification of fetal health status and each fetus' baseline heart rate, provide an appropriate graphic summarizing the distribution of each of baseline heart rates for each class. Be sure to provide the correct title and label for the plot.
+
+Your sister is concerned that her baby does not move as much, which could be a sign of an unhealthy pregnancy. 
+
+Use a density graph, show her the distribution of fetal movements according to different fetal health classifications. You do not have to interpret this graph.
 
 *Solution:*
 
 ```{r}
 #----Question 1----------
 
-# 1.b
+## 1.b
+
+df_fh %>%
+  ggplot(aes(x = fetal_movement, fill = fetal_health))+
+  geom_density(alpha = 0.5) +
+  scale_x_log10()
+
+```
+
+## c)
+
+Your sister's partner tells you that he is colourblind, please fix the graph produced above to provide him with a colourblind-friendly graph.
+
+*Solution:* We can use the "RColorBrewer" package and look for a colourblind-friendly palette. Then apply the package to our ggplot.
+
+```{r}
+# 1.c
+
+display.brewer.all(colorblindFriendly = TRUE)
+
+df_fh %>%
+  ggplot(aes(x = fetal_movement, fill = fetal_health))+
+  geom_density(alpha = 0.5) +
+  scale_x_log10() + 
+  scale_fill_brewer(palette="Set2")
+
+```
+
+## d) {-}
+Your sister also said she thinks her baby's heart rate is faster than normal, which could be a sign of unhealthy pregnancy.
+
+Looking at the 3 different classification of fetal health status and each fetus' baseline heart rate, provide an appropriate graphic summarizing the distribution of each of baseline heart rates for each class. Be sure to provide the correct title and label for the plot.
+
+*Solution:*
+
+```{r}
+
+
+# 1.d
 df_fh$fetal_health <- ifelse(df_fh$fetal_health == 1, 
                              "Normal", 
                              ifelse(df_fh$fetal_health == 2, 
@@ -69,47 +118,14 @@ df_fh %>%
 
 ```
 
-## c) {-}
+## e) {-}
 Comment on the boxplot, what are the characteristics of each category?
 
 *Solution:* 
 
-## d) {-}
+The objective was to show the distribution of baseline heart rates in each health category. The graph above shows that the median fetal baseline heart rate was similar between Normal and Pathological fetuses; both are lower than the suspect group. The range of baseline heart rate was wider for the normal group, and the range for the pathological group is the narrowest. The baseline heart rates were rightly skewed for Normal and Pathological groups. There is considerable overlap between the boxplots of normal category and pathological category, it does not appear that the baseline heart rate significantly differs between these two groups.
 
-Your sister is concerned that her baby does not move as much, which could be a sign of an unhealthy pregnancy. 
-
-Use a density graph, show her the distribution of fetal movements according to different fetal health classifications. Interpret to her the meaning of the box plots.
-
-*Solution:*
-
-```{r}
-## 1.d
-
-df_fh %>%
-  ggplot(aes(x = fetal_movement, fill = fetal_health))+
-  geom_density(alpha = 0.5) +
-  scale_x_log10()
-
-```
-
-## e)
-
-Your sister's partner tells you that he is colourblind, please fix the graph produced above to provide him with a colourblind-friendly graph.
-
-*Solution:* We can use the "RColorBrewer" package and look for a colourblind-friendly palette. Then apply the package to our ggplot.
-
-```{r}
-display.brewer.all(colorblindFriendly = TRUE)
-
-df_fh %>%
-  ggplot(aes(x = fetal_movement, fill = fetal_health))+
-  geom_density(alpha = 0.5) +
-  scale_x_log10() + 
-  scale_fill_brewer(palette="Set2")
-
-```
-
-# Question 2
+# Question 2 {-}
 
 ## a) {-}
 
@@ -269,6 +285,7 @@ The two methods give similar 95% CIs. Normal approximation can be used here sinc
 ## c) {-}
 
 Another sample taken have the same proportion of event but the sample size is now only 10 and the count of abnormal is 2. Calculate the 95% CI using this sample and compare it with the one you have in b). Describe their difference and the reason why. 
+
 ```{r}
 ## ---- Question-5c ------------------------------------------------------------
 mosaic::binom.test(x = 2, n = 10, ci.method = "Clopper-Pearson")
@@ -323,7 +340,7 @@ According to the Poisson test and by hand calculation, two 95% CI for the rate r
 
 \newpage
 
-# Question 5
+# Question 5 {-}
 
 ## a) {-}
 
@@ -339,38 +356,69 @@ According to the linear regression, there is no significant association between 
 
 ## b) {-}
 
-If you want to use a logistic regression model to use **Number of fetal movements per second** to the predict the classification of fetal health outcome. Describe how will you process these three variables to fit a logistic regression. 
+Now you are getting curious with this dataset, and you want to use a logistic regression and predict the classification of fetal health diagnosis (Pathological vs non-pathological) using fetal movement as a binary determinant (normal vs. abnormal rate of movement). State the regression equation, Describe how will you process these three variables to fit a logistic regression. 
 
 *Solution:*
 
+Regression equation:
 
-1. In a logistic regression, the outcome variable is binary variable. In this example, the fetal health outcome will be classified as Pathological, and non-pathological (including normal and suspect). 
+$$
+\frac{\pi}{1-\pi} = \frac{\pi_0}{1-\pi_0} * \theta^{mov}
+$$
+$$
+log(\frac{\pi}{1-\pi}) = log(\frac{\pi_0}{1-\pi_0}) + mov*\theta
+\begin{cases}
+      mov = 1 & \text{if movement is abnormal}\\
+      mov = 0 & \text{if movement is normal}\\
+    \end{cases}
+$$
+$\pi$ is the probability of receiving a pathological diagnosis
 
-2. We will find cut points for the Number of fetal movements per second based on previous literature and hypothesis. 
+$\pi_0$ is the probability of receiving a pathological diagnosis, when fetal movement is lower than 0.01
 
+$\theta_1$ is the odds ratio of receiving a pathological diagnosis, when fetal movement is equal to or higher than 0.01, and it is the **parameter of interest**.
+
+$mov$ is the risk parameter.
+
+1. In a logistic regression, the outcome variable is binary variable. In this example, the fetal health outcome can be classified as Pathological diagnosis, and non-pathological diagnosis (including normal and suspect). 
+
+2. We can determine the abnormal threshold for the number of fetal movements per second based on previous literature and hypothesis and categorize this variable into a binary determinant. 
 
 ## c) {-}
 
-Suppose the normal number of fetal movements per second is within 0.01. Fit the logistic regression model and provide a 95% CI. 
+Suppose the normal number of fetal movements per second is below 0.01. Fit the logistic regression model and provide and interpret the 95% CI for you parameter of interest. 
 
 ```{r}
 df_fh$f_mov <- ifelse(df_fh$fetal_movement>0.01, 1, 0)
-```
-
-```{r}
 df_fh$f_patho <- ifelse(df_fh$fetal_health=="Pathological", 1 , 0)
-```
 
-```{r}
 reg2 <- glm(f_patho~ f_mov, family = binomial (link = "logit"), data = df_fh)
 summary(reg2)
-```
 
-```{r}
+exp(coef(reg2)[2])
+
 exp(confint(reg2))
 ```
+$\theta$ is 1.542. This means that, the odds of receiving a pathological diagnosis in pregnancies with an abnormal fetal movement is 1.54 times the odds of receiving a pathological diagnosis in pregnancies with an normal fetal movement.
 
-# Question 6
+The confidence interval for the parameter of interest $\theta$ is 0.98, 2.35. We are 95% confident that the true odds ratio falls within this range.
+
+
+## d) {-}
+
+Can you calculate the intercept by hand? If yes, show your work, if no, explain what other values do you need to perform this calculation.
+
+*Solution:* Using the equation $Intercept = log(\frac{\pi_0}{1-\pi_0})$, and since $\pi_0$ is the probability of receiving a pathological diagnosis, when fetal movement is lower than 0.01, we can first calculate the odds ratio of $\pi_0$ and then calculate the log this OR.
+
+```{r}
+count <- df_fh %>% 
+  count(f_mov, f_patho)
+prob <- count[2,3] / (count[2,3] + count[1,3])
+odds <- prob/ (1-prob)
+log(odds)
+```
+
+# Question 6 {-}
 
 ## a) {-}
 
@@ -418,21 +466,22 @@ df_fh$ab_var <- ifelse(
 reg3 <- glm(f_patho ~ f_mov + ab_var, family = binomial (link = "logit"), data = df_fh)
 summary(reg3)
 ```
-
+The intercept for this model is -2.3926, which is different from the model above, because it is calculating the log of the odds of receiving a pathological diagnosis, without abnormal long-term variability nor fetal movement. Meanwhile, the intercept in the previous model computes the log of the odds of receiving a pathological diagnosis, only without abnormal fetal movement.
 
 ## c) {-}
 
-You decided to draw a ROC curve and see how well your model works out. Use the pROC package to draw the curve, and comment on what you see.
+You decided to draw a ROC curve and see how well your model works out. Use the pROC package to draw the curve, can the model produce accurate predictions?
 
-*Solution: *
+*Solution: * According to the ROC curve, the model can predict the diagnosis very well. The AUROC is 100%, suggesting that our model can predict the diagnosis with 100% specificity and 100% sensitivity.
 ``` {r}
 rocobj1 <- plot.roc(df_fh$f_mov, fitted(reg3),
                     percent=TRUE,
-                    ci=TRUE, # compute AUC (of AUC by default)
+                    ci=TRUE, 
                     print.auc=TRUE)
 
-ciobj <- ci.se(rocobj1, # CI of sensitivity
-               specificities=seq(0, 100, 5)) # over a select set of specificities
-plot(ciobj, type="shape", col="#1c61b6AA") # plot as a blue shape
-plot(ci(rocobj1, of="thresholds", thresholds="best")) # add one threshold
+ciobj <- ci.se(rocobj1,
+               specificities=seq(0, 100, 5))
+
+plot(ciobj, type="shape", col="#1c61b6AA") 
+plot(ci(rocobj1, of="thresholds", thresholds="best"))
 ```
