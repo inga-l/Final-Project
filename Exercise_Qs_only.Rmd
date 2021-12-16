@@ -149,6 +149,10 @@ Does your sample suggest that the babies coming from two hospitals have signific
 
 # Question 5 {-}
 
+## a) {-}
+
+Your sister's partner said, their obstetrician told them that the Fetal Heart Rate could be a reflection of a lower value of short term variability. Can you conduct a linear regression to test it? Is it significant?
+
 ## b) {-}
 
 Now you are getting curious with this dataset, and you want to use a logistic regression and predict the classification of fetal health diagnosis (Pathological vs non-pathological) using fetal movement as a binary determinant (normal vs. abnormal rate of movement). State the regression equation, Describe how will you process these three variables to fit a logistic regression. 
