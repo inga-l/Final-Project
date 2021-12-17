@@ -276,14 +276,15 @@ The probability of having more than 30 abnormal is 0.197.
 
 ## b) {-} 
 
-Turns out that your sample actually contains 20 babies with abnormal health status. What is the 95% confidence interval of this proportion? Can you use a normal approximation for this sample? Why or why not? State your assumptions, if any. 
+Turns out that your sample actually contains 20 babies with abnormal health status. Provide and interprete the 95% confidence interval of this proportion? Can you use a normal approximation for this sample? Why or why not? State your assumptions, if any. 
 ```{r}
 # 4.1.a 
 mosaic::binom.test(x = 20, n = 100, ci.method = "Clopper-Pearson")
 mosaic::binom.test(x = 20, n = 100, ci.method = "Wald")
 ```
-The 95% CI using Clopper-Pearson method: [0.127,0.292]
-The 95% CI using exact method(ie: normal approximation): [0.122,0.278]
+The 95% CI using Clopper-Pearson method: [0.127,0.292], representing that we are 95% confident that the true value of proportion will fall in this region
+The 95% CI using exact method(ie: normal approximation): [0.122,0.278], representing that we are 95% confident that the true value of proportion will fall in this region
+
 The two methods give similar 95% CIs. Normal approximation can be used here since the sample size is large enough to generate a binomial distribution approximating the normal distribution and for CLT to kick in. 
 Assumptions: the sample observations are independent and randomly taken, also the number of successes and failures in each group is large eough so we can use the CLT
 
