@@ -99,7 +99,7 @@ df_fh %>%
 ## d) {-}
 Your sister also said she thinks her baby's heart rate is faster than normal, which could be a sign of unhealthy pregnancy.
 
-Looking at the 3 different classification of fetal health status and each fetus' baseline heart rate, provide an appropriate graphic summarizing the distribution of each of baseline heart rates for each class. Be sure to provide the correct title and label for the plot.
+Looking at the 3 different classification of fetal health status and each fetus' baseline heart rate, provide an appropriate graphic summarizing the distribution of each of baseline heart rates for each class. Be sure to provide the correct title and label for the plot. Comment on the boxplot, what are the characteristics of each category?
 
 *Solution:*
 
@@ -114,9 +114,6 @@ df_fh %>%
        y = "Baseline heart rate (beats/min)")
 
 ```
-
-## e) {-}
-Comment on the boxplot, what are the characteristics of each category?
 
 *Solution:* 
 
@@ -272,7 +269,7 @@ df_fh %>%
 #the probability of having abnormal is 471/2126 = 0.22
 1 - mosaic::xpbinom(q = 25, size = 100, prob = 0.22)
 ```
-The probability of having more than 30 abnormal is 0.197. 
+The probability of having more than 25 abnormal is 0.197. 
 
 ## b) {-} 
 
@@ -286,7 +283,7 @@ The 95% CI using Clopper-Pearson method: [0.127,0.292], representing that we are
 The 95% CI using exact method(ie: normal approximation): [0.122,0.278], representing that we are 95% confident that the true value of proportion will fall in this region
 
 The two methods give similar 95% CIs. Normal approximation can be used here since the sample size is large enough to generate a binomial distribution approximating the normal distribution and for CLT to kick in. 
-Assumptions: the sample observations are independent and randomly taken, also the number of successes and failures in each group is large eough so we can use the CLT
+Assumptions: the sample observations are independent and randomly taken, also the number of successes and failures in each group is large enough so we can use the CLT.
 
 ## c) {-}
 
@@ -321,7 +318,7 @@ stats::poisson.test(x = 30, T = 100)
 
 Rate: 0.3
 95% CI: [0.20,0.43]
-There is a 95% chance that the confidence interval [0.20,0.43] captures the true rate.
+We are 95% confident that the true rate would fall ub this region of the confidence interval [0.20,0.43].
 
 ## b) {-}
 
@@ -348,7 +345,7 @@ According to the Poisson test and by hand calculation, two 95% CI for the rate r
 
 ## a) {-}
 
-Your sister's partner said, their obstetrician told them that the Fetal Heart Rate could be a reflection of a lower value of short term variability. Can you conduct a linear regression to test it? Is it significant?
+Your sister's partner said, their obstetrician told them that the Fetal Heart Rate could be a reflection of a lower value of short term variability. Can you conduct a linear regression to test it? Is there evidence of a statistically significant association bewteen baseline heart rate and value of short term variability at $\alpha$ = 0.05?
 
 *Solution:*
 
@@ -358,7 +355,7 @@ Your sister's partner said, their obstetrician told them that the Fetal Heart Ra
 reg1 <- lm(mean_value_of_long_term_variability ~ `baseline value`, data = df_fh)
 summary(reg1)
 ```
-According to the linear regression, there is no significant association between baseline heart rate and value of short term variability. 
+No. According to the linear regression, the p-value of the baseline heart rate is 0.139, which is greater than $\alpha$ = 0.05. There is no evidence of a statistically significant association between baseline heart rate and value of short term variability. 
 
 ## b) {-}
 
@@ -378,9 +375,9 @@ log(\frac{\pi}{1-\pi}) = log(\frac{\pi_0}{1-\pi_0}) + mov*\theta
       mov = 0 & \text{if movement is normal}\\
     \end{cases}
 $$
-$\pi$ is the probability of receiving a pathological diagnosis
+$\pi$ is the probability of receiving a pathological diagnosis.
 
-$\pi_0$ is the probability of receiving a pathological diagnosis, when fetal movement is lower than 0.01
+$\pi_0$ is the probability of receiving a pathological diagnosis, when fetal movement is lower than 0.01.
 
 $\theta_1$ is the odds ratio of receiving a pathological diagnosis, when fetal movement is equal to or higher than 0.01, and it is the **parameter of interest**.
 
@@ -408,7 +405,7 @@ exp(confint(reg2))
 ```
 $\theta$ is 1.542. This means that, the odds of receiving a pathological diagnosis in pregnancies with an abnormal fetal movement is 1.54 times the odds of receiving a pathological diagnosis in pregnancies with an normal fetal movement.
 
-The confidence interval for the parameter of interest $\theta$ is 0.98, 2.35. We are 95% confident that the true odds ratio falls within this range.
+The confidence interval for the parameter of interest $\theta$ is [0.98, 2.35]. We are 95% confident that the true odds ratio falls within this range.
 
 
 ## d) {-}
