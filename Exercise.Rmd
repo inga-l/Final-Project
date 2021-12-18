@@ -152,7 +152,9 @@ Nevertheless, further testing is required to confirm this observation.
 
 **Since we have a small sample size for those who are suspected to be pathological and those who are determined to be pathological, what is one method that we can use to artificially create a pseudo-population and calculate the median of these two groups? State your assumptions.**
 
-*Solution:*  Bootstrapping, the assumptions are simple random sampling and the samples are representative of the population.
+*Solution:*  
+
+Bootstrapping, the assumptions are simple random sampling and the samples are representative of the population.
 
 ```{r}
 # 2.b
@@ -182,7 +184,9 @@ mean(R_p)
 
 **What is one weakness of using the bootstrapping method?**
 
-*Solution:* The bootstrapping method assumes that the sample is representative of the whole population. However, when we have a small sample size, that is not always the case. There could be sampling errors which can skew the distribution of the sample. And the bootstrapping method cannot correct this error as it can only sample within this small set of data. As the saying goes, "garbage in, garbage out". If the sample is not representative of the population, the results obtained from bootstrap will not be accurate and will result in an incorrect inference of the population parameter.
+*Solution:* 
+
+The bootstrapping method assumes that the sample is representative of the whole population. However, when we have a small sample size, that is not always the case. There could be sampling errors which can skew the distribution of the sample. And the bootstrapping method cannot correct this error as it can only sample within this small set of data. As the saying goes, "garbage in, garbage out". If the sample is not representative of the population, the results obtained from bootstrap will not be accurate and will result in an incorrect inference of the population parameter.
 
 \newpage
 
@@ -284,22 +288,28 @@ df_fh %>%
 #the probability of having abnormal is 471/2126 = 0.22
 1 - mosaic::xpbinom(q = 25, size = 100, prob = 0.22)
 ```
-The probability of having more than 30 abnormal is 0.197. 
+The probability of having more than 25 abnormal is 0.197. 
 
 ## b) {-} 
 
 **Turns out that your sample actually contains 20 babies with abnormal health status. What is the 95% confidence interval of this proportion? Can you use a normal approximation for this sample? Why or why not?**
 
 *Solution:*
+Turns out that your sample actually contains 20 babies with abnormal health status. Provide and interprete the 95% confidence interval of this proportion? Can you use a normal approximation for this sample? Why or why not? State your assumptions, if any. 
 
 ```{r}
 # 4.1.a 
 mosaic::binom.test(x = 20, n = 100, ci.method = "Clopper-Pearson")
 mosaic::binom.test(x = 20, n = 100, ci.method = "Wald")
 ```
-The 95% CI using Clopper-Pearson method: [0.127,0.292]
-The 95% CI using exact method(ie: normal approximation): [0.122,0.278]
+
+The 95% CI using Clopper-Pearson method: [0.127,0.292], representing that we are 95% confident that the true value of proportion will fall in this region
+
+The 95% CI using exact method(ie: normal approximation): [0.122,0.278], representing that we are 95% confident that the true value of proportion will fall in this region
+
 The two methods give similar 95% CIs. Normal approximation can be used here since the sample size is large enough to generate a binomial distribution approximating the normal distribution and for CLT to kick in. 
+
+Assumptions: the sample observations are independent and randomly taken, also the number of successes and failures in each group is large enough so we can use the CLT.
 
 ## c) {-}
 
@@ -311,17 +321,23 @@ The two methods give similar 95% CIs. Normal approximation can be used here sinc
 # 4.1.c
 mosaic::binom.test(x = 2, n = 10, ci.method = "Clopper-Pearson")
 ```
+
 The 95% CI for this sample is: [0.0252, 0.556].
+
 95% CI in c) with sample size = 10 is wider than the 95% CI in b) with sample size = 100. 
+
 The sample size is different so the standard error is different. The 95% CI is calculated using the formula: 
+
 $$
 \bar y - 1.96(\frac {\sigma} {\sqrt n}) , \bar y + 1.96(\frac {\sigma} {\sqrt n}) 
 $$
+
 If the sample size n is larger, the standard error(sigma/sqrt n) is smaller. The value 1.96*standard error is also smaller, and results in a narrower confident interval.
 
 \newpage
 
 # Question 4.2 One sample Rate{-}
+
 **You continue to work with the simple random sample. This time you take 100 babies from the a different hospital as the sample from the population.**
 
 ## a) {-}
@@ -336,7 +352,9 @@ stats::poisson.test(x = 30, T = 100)
 ```
 
 Rate: 0.3 cases per person-year
+
 95% CI: [0.20,0.43], unit: per person-year
+
 There is a 95% chance that the confidence interval [0.20,0.43] captures the true rate.
 
 ## b) {-}
@@ -357,7 +375,9 @@ stats::poisson.test(x = 30, T = 471/2126*100)
 ```
 
 95% CI by hand: [0.92.1.95] per person-year
+
 95% CI by canned function: [0.91,0.933] per person-year
+
 According to the Poisson test and by hand calculation, two 95% CI for the rate ratio both contains the null value 1. The 95% CI and the p-value suggests that the difference between two hospitals is not statistically significant. 
 
 \newpage
@@ -382,9 +402,10 @@ log(\frac{\pi}{1-\pi}) = log(\frac{\pi_0}{1-\pi_0}) + mov*\theta
       mov = 0 & \text{if movement is normal}\\
     \end{cases}
 $$
-$\pi$ is the probability of receiving a pathological diagnosis
 
-$\pi_0$ is the probability of receiving a pathological diagnosis, when fetal movement is lower than 0.01
+$\pi$ is the probability of receiving a pathological diagnosis.
+
+$\pi_0$ is the probability of receiving a pathological diagnosis, when fetal movement is lower than 0.01.
 
 $\theta_1$ is the odds ratio of receiving a pathological diagnosis, when fetal movement is equal to or higher than 0.01, and it is the **parameter of interest**.
 
@@ -412,16 +433,19 @@ exp(coef(reg2)[2])
 
 exp(confint(reg2))
 ```
+
 $\theta$ is 1.542. This means that, the odds of receiving a pathological diagnosis in pregnancies with an abnormal fetal movement is 1.54 times the odds of receiving a pathological diagnosis in pregnancies with an normal fetal movement.
 
-The confidence interval for the parameter of interest $\theta$ is 0.98, 2.35. We are 95% confident that the true odds ratio falls within this range.
+The confidence interval for the parameter of interest $\theta$ is [0.98, 2.35]. We are 95% confident that the true odds ratio falls within this range.
 
 
 ## c) {-}
 
 **Can you calculate the intercept by hand? If yes, show your work, if no, explain what other values do you need to perform this calculation.**
 
-*Solution:* Using the equation $Intercept = log(\frac{\pi_0}{1-\pi_0})$, and since $\pi_0$ is the probability of receiving a pathological diagnosis, when fetal movement is lower than 0.01, we can first calculate the odds ratio of $\pi_0$ and then calculate the log this OR.
+*Solution:* 
+
+Using the equation $Intercept = log(\frac{\pi_0}{1-\pi_0})$, and since $\pi_0$ is the probability of receiving a pathological diagnosis, when fetal movement is lower than 0.01, we can first calculate the odds ratio of $\pi_0$ and then calculate the log this OR.
 
 ```{r}
 # 5.c
@@ -459,6 +483,7 @@ $$
 $$
 log(\frac{\pi}{1-\pi}) = log(\frac{\pi_0}{1-\pi_0})+mov*log(\theta_1) + var*log(\theta_2)
 $$
+
 $\pi$ is the probability of receiving a pathological diagnosis
 
 $\pi_0$ is the probability of receiving a pathological diagnosis, when fetal movement is lower than 0.01 and no abnormal long-term variability
